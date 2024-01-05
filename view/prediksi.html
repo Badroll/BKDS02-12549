@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predictor Page</title>
+    <style>
+        /* CSS yang sudah ada */
+
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .container {
+            width: 90%;
+            margin: 20px auto;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .header {
+            background-color: #3498db;
+            color: #fff;
+            padding: 20px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 30%;
+        }
+
+        .file-container {
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 70%;
+        }
+
+        form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        .result-container {
+            margin-top: 20px;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 18px;
+            margin: 0;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="form-container" style="margin-right: 5px;">
+            <div align="center">
+                <h2>Single Heart Disease Predictor</h2>
+            </div>
+            
+            <form action="{{ url_for('predict') }}" method="post">
+                <label for="age">Age:</label>
+                <input type="number" name="age" required step="any"><br>
+
+                <label for="sex">Sex:</label>
+                <select name="sex" required>
+                    <option value="0">Female</option>
+                    <option value="1">Male</option>
+                </select><br>
+
+                <label for="cp">Chest Pain Type:</label>
+                <select name="cp" required>
+                    <option value="1">Typical angina</option>
+                    <option value="2">Atypical angina</option>
+                    <option value="3">Non-anginal pain</option>
+                    <option value="4">Asymptomatic</option>
+                </select><br>
+
+                <label for="trestbps">Resting Blood Pressure:</label>
+                <input type="number" name="trestbps" required step="any"><br>
+
+                <label for="chol">Cholesterol:</label>
+                <input type="number" name="chol" required step="any"><br>
+
+                <label for="fbs">Fasting Blood Sugar:</label>
+                <select name="fbs" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select><br>
+
+                <label for="restecg">Resting Electrocardiographic Results:</label>
+                <select name="restecg" required>
+                    <option value="0">Normal</option>
+                    <option value="1">Having ST-T wave abnormality</option>
+                    <option value="2">Showing probable or definite left ventricular hypertrophy by Estes' criteria</option>
+                </select><br>
+
+                <label for="thalach">Maximum Heart Rate Achieved:</label>
+                <input type="number" name="thalach" required step="any"><br>
+
+                <label for="exang">Exercise Induced Angina:</label>
+                <select name="exang" required>
+                    <option value="0">No</option>
+                    <option value="1">Yes</option>
+                </select><br>
+
+                <label for="oldpeak">Oldpeak:</label>
+                <input type="number" name="oldpeak" required step="any"><br>
+
+                <button type="submit">Predict</button>
+            </form>
+            <br>
+            <div align="center">
+                {% if info %}
+                    <h2>Prediction Result: <b>{{ info }}</b></h2>
+                {% endif %}
+            </div>
+            <br>
+        </div>
+
+        <div class="file-container" style="margin-left: 5px;">
+            <div align="center">
+                <h2>Multiple Heart Disease Predictor</h2>
+            </div>
+            <form action="{{ url_for('predict') }}" method="post"  enctype="multipart/form-data">
+                <label for="file">Upload Excel/CSV File:</label>
+                <input type="file" name="file" id="file" accept=".csv, .xlsx"><br>
+
+                <!-- <button type="button" onclick="uploadFile()">Submit File</button> -->
+                <button type="submit">Submit File</button>
+            </form>
+
+            <div class="result-container">
+                <h2>File Prediction Results:</h2>
+                <div id="file-prediction-info">
+                    {% if results %}
+                        {{ results | safe }}  {# Use the | safe filter to render HTML #}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function uploadFile() {
+            // Implement file upload logic here
+            // You can use JavaScript to handle the file upload and prediction results
+            // Update the content inside the "file-prediction-info" paragraph accordingly
+            document.getElementById("file-prediction-info").innerText = "File upload and prediction results will be displayed here.";
+        }
+    </script>
+</body>
+</html>
