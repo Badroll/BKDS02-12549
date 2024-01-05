@@ -53,8 +53,7 @@ def index():
 # memproses prediksi dan mengembalikannya
 @app.route("/predict", methods=['POST'])
 def predict():
-    file = request.files["file"]
-    if file == None:
+    if request.form.get("type") == "single":
         # jika tipe prediksi tunggal
         age = request.form.get("age")
         sex = request.form.get("sex")
@@ -85,6 +84,7 @@ def predict():
 
     else:
         # jika tipe prediksi multi (banyak)
+        file = request.files["file"]
         filename = saveFile(file)
         print(filename)
 
