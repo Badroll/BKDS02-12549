@@ -12,9 +12,11 @@ from datetime import datetime
 import pickle
 import pandas as pd
 import hashlib
+import json
 
 # mendefinisikan app sebagai flask
 app = Flask(__name__, template_folder="view")
+acc = json.load(open("accuracy.json"))
 
 # fungsi untuk return JSON (API)
 def composeReply(status, message, payload = None):
@@ -42,7 +44,10 @@ def saveFile(file):
 # menuju halaman index untuk memprediksi
 @app.route("/", methods=['GET'])
 def index():
-    return render_template("prediksi.html", data={})
+    r = {
+        "accuracy" : acc["accuracy"]
+    }
+    return render_template("prediksi.html", **r)
 
 
 # memproses prediksi dan mengembalikannya
@@ -176,8 +181,9 @@ def predict():
             "results" : html
         }
         os.remove(f"uploads/{filename}")
-        #return composeReply("SUCCESS", "Prediksi", r)
-        return render_template("prediksi.html", **r)
+    r["accuracy"] = acc["accuracy"]
+    #return composeReply("SUCCESS", "Prediksi", r)
+    return render_template("prediksi.html", **r)
 
 
 # fungsi utama untuk memprediksi
