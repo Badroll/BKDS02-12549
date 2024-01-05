@@ -1,3 +1,9 @@
+# DEPLOY MENGGUNAKAN FLASK
+# Hasil dari prediksi berupa model (termasuk informasi scaler) akan digunakan di sini
+
+
+# menggunakan modul utama Flask sebagia web server
+# web host menggunakan VPS
 from flask import Flask, request, send_file, jsonify, render_template
 from sklearn.model_selection import train_test_split
 from os import path
@@ -7,9 +13,10 @@ import pickle
 import pandas as pd
 import hashlib
 
-
+# mendefinisikan app sebagai flask
 app = Flask(__name__, template_folder="view")
 
+# fungsi untuk return JSON (API)
 def composeReply(status, message, payload = None):
     reply = {}
     reply["SENDER"] = "MSTH AI"
@@ -18,6 +25,7 @@ def composeReply(status, message, payload = None):
     reply["PAYLOAD"] = payload
     return jsonify(reply)
 
+# menyimpan file
 ALLOWED_EXTENSION = set(["csv", "xslx"])
 def allowed_file(filename):
     return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSION
@@ -31,16 +39,18 @@ def saveFile(file):
         return filename
     except TypeError as error : return [False, "Save file failed [" + error]
 
-
+# menuju halaman index untuk memprediksi
 @app.route("/", methods=['GET'])
 def index():
     return render_template("prediksi.html", data={})
 
 
+# memproses prediksi dan mengembalikannya
 @app.route("/predict", methods=['POST'])
 def predict():
     file = request.files["file"]
     if file == None:
+        # jika tipe prediksi tunggal
         age = request.form.get("age")
         sex = request.form.get("sex")
         cp = request.form.get("cp")
@@ -67,7 +77,9 @@ def predict():
         }
         r = inference(new_data_dict)
         print(r)
+
     else:
+        # jika tipe prediksi multi (banyak)
         filename = saveFile(file)
         print(filename)
 
@@ -79,6 +91,7 @@ def predict():
             # Mengonversi DataFrame ke CSV
             df = pd.read_csv(file_path)
 
+        # merender hasil dalam bentuk tabel
         html = """<style>
                     .styled-table {
                         width: 100%;
@@ -167,6 +180,7 @@ def predict():
         return render_template("prediksi.html", **r)
 
 
+# fungsi utama untuk memprediksi
 def inference(new_data_dict):
     print(new_data_dict)
 
@@ -175,23 +189,23 @@ def inference(new_data_dict):
     with open("scaler.pkl", 'rb') as file:
         scaler = pickle.load(file)
 
-    # Membuat DataFrame dari data input
+    # membuat DataFrame dari data input
     df = pd.DataFrame(new_data_dict)
 
-    # Mengonversi DataFrame menjadi array NumPy
+    # mengonversi DataFrame menjadi array NumPy
     numpy_array = df.values.flatten().astype(float)
 
-    # Memastikan array memiliki dimensi yang sesuai dengan model (10 fitur)
+    # memastikan array memiliki dimensi yang sesuai dengan model (10 fitur)
     if numpy_array.shape[0] != 10:
         print("Error: Jumlah fitur tidak sesuai dengan model.")
     else:
-        # Reshape array menjadi bentuk yang sesuai dengan model (10 fitur)
+        # reshape array menjadi bentuk yang sesuai dengan model (10 fitur)
         x = numpy_array.reshape(1, -1)
 
-        # Normalisasi menggunakan scaler
+        # normalisasi menggunakan scaler
         x_normal = scaler.transform(x)
 
-        # Memprediksi dengan model yang sudah diload
+        # memprediksi dengan model yang sudah diload
         prediction = loaded_model.predict(x_normal)
         prediction = prediction.tolist()[0]
         ref = {
@@ -203,7 +217,7 @@ def inference(new_data_dict):
         }
         print("Prediction:", prediction)
 
-        # Menampilkan hasil probabilitas
+        # menampilkan hasil probabilitas
         prediction_proba = loaded_model.predict_proba(x_normal)
         print("Class Probabilities:", prediction_proba)
 
